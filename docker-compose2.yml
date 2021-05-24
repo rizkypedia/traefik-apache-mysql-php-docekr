@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./build/app/Dockerfile
+    container_name: "${PROJECT_NAME}-app"
+    working_dir: "/var/www/project"
+    env_file:
+      - ./.env
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+    networks:
+      - web
+      - app_network
+
+  mysql:
+    image: mysql:5.7
+    container_name: "${PROJECT_NAME}-mysql"
+    ports:
+    - '3307:3306'
+    env_file:
+      - ./.env
+    command: "--max-allowed-packet=8388608"
+    volumes:
+      - /var/lib/mysql
+    networks:
+      - web
+      - app_network
+networks:
+  app_network:
+    driver: bridge

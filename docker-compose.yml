@@ -1,0 +1,30 @@
+version: "3.5"
+services:
+  traefik:
+    restart: always
+    image: library/traefik:v1.7-alpine
+    env_file:
+      - .env
+    labels:
+      traefik.enable: true
+      traefik.frontend.rul: "Host.traefik.${DOMAIN_SUFFIX}"
+      traefik.port: 8080
+    container_name: traefik
+    command:
+      - "--docker=true"
+      - "--docker.exposedbydefault=false"
+      - "--api"
+      - "--docker"
+      - "--docker.domain=${DOMAIN_SUFFIX}"
+      - "--docker.network=web"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+networks:
+  web:
+    external: true

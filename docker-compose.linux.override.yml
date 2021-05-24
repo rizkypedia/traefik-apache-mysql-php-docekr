@@ -1,0 +1,35 @@
+version: "3.5"
+services:
+  app:
+    labels:
+      - "traefik.backend=${PROJECT_NAME}-app"
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - "traefik.frontend.rule=Host:${PROJECT_NAME}.${DOMAIN_SUFFIX}"
+      - traefik.port=80
+      - traefik.protocol=http
+    volumes:
+      - "$SYNC_PATH/:/var/www/project:cached"
+      - "$DUMP_PATH/:/dump"
+      - "$SSH_AUTH_SOCK:/ssh-agent" # Forward local machine SSH key to docker
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+    networks:
+      - web
+      - app_network
+  maildev:
+      image: djfarrelly/maildev:latest
+      container_name: "${PROJECT_NAME}-maildev"
+      labels:
+        - "traefik.backend=${PROJECT_NAME}-mail"
+        - traefik.enable=true
+        - traefik.docker.network=web
+        - "traefik.frontend.rule=Host:${PROJECT_NAME}.mail.${DOMAIN_SUFFIX}"
+        - traefik.port=80
+        - traefik.protocol=http
+      networks:
+        - web
+        - app_network
+networks:
+  web:
+    external: true

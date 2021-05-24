@@ -1,0 +1,10 @@
+version: "3.5"
+services:
+  selenium:
+    shm_size: "2G"
+    container_name: "${PROJECT_NAME}-selenium"
+    image: "derh4nnes/selenium-chrome-headless"
+    volumes:
+      - "$SYNC_PATH/:/app"
+    networks:
+      - app_network
